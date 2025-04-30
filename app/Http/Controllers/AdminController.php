@@ -29,8 +29,45 @@ class AdminController extends Controller
         summary: 'List all admins',
         security: [['bearerAuth' => []]],
         tags: ['Admins'],
+        parameters: [
+            new OA\Parameter(
+                name: 'limit',
+                description: 'Defines how many records should be returned per page (i.e., the number of items displayed in one page of results).',
+                required: false,
+                in: 'query',
+                schema: new OA\Schema(
+                    type: 'integer',
+                    format: 'integer',
+                    example: 20
+                )
+            ),
+            new OA\Parameter(
+                name: 'offset',
+                description: 'Specifies which page of the results to display. The page number helps navigate through the paginated records.',
+                required: false,
+                in: 'query',
+                schema: new OA\Schema(
+                    type: 'integer',
+                    format: 'integer',
+                    example: 1
+                )
+            ),
+            new OA\Parameter(
+                name: 'search',
+                description: 'Search value',
+                required: false,
+                in: 'query',
+                schema: new OA\Schema(
+                    type: 'string',
+                    example: 'test'
+                )
+            )
+        ],
         responses: [
-            new OA\Response(response: 200, description: 'Success')
+            new OA\Response(
+                response: 200,
+                description: 'Success'
+            )
         ]
     )]
 
@@ -118,7 +155,7 @@ class AdminController extends Controller
         requestBody: new OA\RequestBody(
             required: true,
             content: new OA\JsonContent(
-                required: ['name', 'email', 'password', 'role_id'],
+                required: ['name', 'email', 'password'],
                 properties: [
                     new OA\Property(property: 'name', type: 'string', example: 'John Doe'),
                     new OA\Property(property: 'email', type: 'string', format: 'email', example: 'john@example.com'),
@@ -128,9 +165,41 @@ class AdminController extends Controller
             )
         ),
         responses: [
-            new OA\Response(response: 200, description: 'Admin updated successfully'),
-            new OA\Response(response: 404, description: 'Admin not found'),
-            new OA\Response(response: 422, description: 'Validation error')
+            new OA\Response(
+                response: 200,
+                description: 'Admin updated successfully',
+                content: new OA\JsonContent(
+                    example: [
+                        'message' => 'Admin updated successfully',
+                        'data' => [
+                            'id' => 1,
+                            'name' => 'John Doe',
+                            'email' => 'john@example.com',
+                            'role_id' => 1
+                        ]
+                    ]
+                )
+            ),
+            new OA\Response(
+                response: 404,
+                description: 'Admin not found',
+                content: new OA\JsonContent(
+                    example: ['error' => 'Admin not found.']
+                )
+            ),
+            new OA\Response(
+                response: 422,
+                description: 'Validation error',
+                content: new OA\JsonContent(
+                    example: [
+                        'error' => 'Validation failed.',
+                        'details' => [
+                            'email' => ['The email has already been taken.'],
+                            'password' => ['The password must be at least 8 characters.']
+                        ]
+                    ]
+                )
+            )
         ]
     )]
 
@@ -160,7 +229,6 @@ class AdminController extends Controller
                 'error' => 'Role not found.'
             ], 404);
         }
-    
         // Proceed to update the admin
         try {
             $response = $this->service->updateAdmin($request, $id, $role);
@@ -178,7 +246,27 @@ class AdminController extends Controller
         }
     }
     
-
+    #[OA\Delete(
+        path: '/api/admin/admins/{id}',
+        summary: 'Delete an admin',
+        security: [['bearerAuth' => []]],
+        tags: ['Admins'],
+        parameters: [
+            new OA\Parameter(
+                name: 'id',
+                in: 'path',
+                required: true,
+                description: 'The ID of the admin to delete',
+                schema: new OA\Schema(type: 'integer')
+            ),
+        ],
+        responses: [
+            new OA\Response(response: 200, description: 'Admin deleted successfully'),
+            new OA\Response(response: 403, description: 'Unauthorized'),
+            new OA\Response(response: 404, description: 'Admin not found'),
+        ]
+    )]
+    
     /**
      * Delete the requested data from db
      *
