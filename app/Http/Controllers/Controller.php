@@ -1,34 +1,13 @@
 <?php
 
 namespace App\Http\Controllers;
+use OpenApi\Attributes as OA;
 
-/**
- * @OA\Info(
- *     title="Booking Swagger API",
- *     version="1.0.0",
- *     @OA\Contact(
- *         email="admin@example.com"
- *     ),
- *     @OA\License(
- *         name="Apache 2.0",
- *         url="http://www.apache.org/licenses/LICENSE-2.0.html"
- *     )
- * )
- * @OA\Tag(
- *     name="Bookings",
- *     description="Booking Pages",
- * )
- * @OA\Server(
- *     description="Laravel Swagger API server",
- *     url="http://localhost/api"
- * )
- * @OA\SecurityScheme(
- *     type="apiKey",
- *     in="header",
- *     name="X-APP-ID",
- *     securityScheme="X-APP-ID"
- * )
- */
+#[OA\Info(version: "1.0.0", description: "Shopping Api", title: "Shopping Documentation")]
+#[OA\Server(url: 'http://localhost:8001', description: "local server")]
+#[OA\Server(url: 'http://staging.example.com', description: "staging server")]
+#[OA\Server(url: 'http://example.com', description: "production server")]
+#[OA\SecurityScheme(securityScheme: 'bearerAuth', type: "http", name: "Authorization", in: "header", scheme: "bearer")]
 
 class Controller extends \App\Api\Foundation\Routing\Controller
 {
